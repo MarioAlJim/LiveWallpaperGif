@@ -2,6 +2,6 @@
 <wallpaper
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:label="Gif wallpaper"
-    android:thumbnail="@mipmap/ic_launcher">
-
+    android:thumbnail="@mipmap/icon"
+    android:settingsActivity = "com.silverwolf.secondwallpaper.LiveSettingsActivity">
 </wallpaper>

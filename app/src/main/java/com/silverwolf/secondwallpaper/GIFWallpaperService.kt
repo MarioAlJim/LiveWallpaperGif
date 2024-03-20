@@ -1,10 +1,12 @@
 package com.silverwolf.secondwallpaper
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.graphics.Movie
 import android.os.Handler
 import android.service.wallpaper.WallpaperService
 import android.util.Log
+import android.view.MotionEvent
 import android.view.SurfaceHolder
 import com.silverwolf.secondwallpaper.R.drawable.elisyan
 import java.io.IOException
@@ -69,6 +71,29 @@ class GIFWallpaperService : WallpaperService() {
             super.onDestroy()
             handler.removeCallbacks(drawGif)
         }
-    }
 
+        override fun onTouchEvent(event: MotionEvent?) {
+            if (event?.action == MotionEvent.ACTION_DOWN) {
+                performFlashEffect()
+            }
+        }
+
+        private fun performFlashEffect() {
+            val flashColor = Color.WHITE // Color para el destello, puedes ajustarlo según tus preferencias
+            val flashDuration = 200L // Duración del destello en milisegundos
+
+            // Cambia el color de fondo del lienzo temporalmente para simular el destello
+            val flashCanvas = holder.lockCanvas()
+            flashCanvas.drawColor(flashColor)
+            holder.unlockCanvasAndPost(flashCanvas)
+
+            // Después del tiempo de destello, restaura el fondo al color original
+            handler.postDelayed({
+                val canvas = holder.lockCanvas()
+                canvas.drawColor(Color.BLACK) // Cambia el color de fondo al original (en este caso, negro)
+                movie.draw(canvas, 0f, 0f) // Dibuja la imagen del GIF nuevamente
+                holder.unlockCanvasAndPost(canvas)
+            }, flashDuration)
+        }
+    }
 }

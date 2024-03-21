@@ -18,10 +18,10 @@
             android:exported="true" />
 
         <service
-            android:name=".GIFWallpaperService"
+            android:name=".WeatherWallpaperService"
             android:enabled="true"
             android:exported="true"
-            android:label="Gifo wallpaper"
+            android:label="Clouds wallpaper"
             android:permission="android.permission.BIND_WALLPAPER">
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />

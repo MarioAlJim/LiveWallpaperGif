@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="cloud_images">
+        <item>@drawable/cloud_1</item>
+        <item>@drawable/cloud_2</item>
+        <item>@drawable/cloud_3</item>
+        <item>@drawable/cloud_4</item>
+        <item>@drawable/cloud_5</item>
+        <item>@drawable/cloud_6</item>
+        <item>@drawable/cloud_7</item>
+        <item>@drawable/cloud_8</item>
+        <item>@drawable/cloud_9</item>
+        <item>@drawable/cloud_10</item>
+    </array>
+</resources>

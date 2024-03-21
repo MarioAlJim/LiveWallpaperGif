@@ -23,7 +23,7 @@ class WeatherWallpaperService : WallpaperService() {
         private val handler = Handler(handlerThread.looper)
         private lateinit var surfaceHolder: SurfaceHolder
         private var isVisible = false
-        private lateinit var movingPNGAnimation: CloudsAnimation
+        private lateinit var cloudsAnimation: CloudsAnimation
         private val frameRate = 8L
         private var lastFrameTime = 0L
 
@@ -32,7 +32,7 @@ class WeatherWallpaperService : WallpaperService() {
                 intent?.let {
                     if (it.action == "com.silverwolf.secondwallpaper.ACTION_SPEED_CHANGED") {
                         val newSpeed = it.getIntExtra("speed", 5)
-                        movingPNGAnimation.setSpeed(newSpeed)
+                        cloudsAnimation.setSpeed(newSpeed)
                     }
                 }
             }
@@ -53,8 +53,8 @@ class WeatherWallpaperService : WallpaperService() {
             }
             cloudImagesArray.recycle()
 
-            movingPNGAnimation = CloudsAnimation(applicationContext, bitmaps)
-            movingPNGAnimation.initClouds()
+            cloudsAnimation = CloudsAnimation(applicationContext, bitmaps)
+            cloudsAnimation.initClouds()
         }
 
         private val drawRunnable = object : Runnable {
@@ -72,6 +72,7 @@ class WeatherWallpaperService : WallpaperService() {
             }
         }
 
+
         override fun onVisibilityChanged(visible: Boolean) {
             isVisible = visible
             handler.apply {
@@ -88,7 +89,7 @@ class WeatherWallpaperService : WallpaperService() {
             if (canvas != null) {
                 // Clear canvas
                 canvas.drawColor(0, android.graphics.PorterDuff.Mode.CLEAR)
-                movingPNGAnimation.draw(canvas)
+                cloudsAnimation.draw(canvas)
                 // Release the canvas
                 surfaceHolder.unlockCanvasAndPost(canvas)
             }

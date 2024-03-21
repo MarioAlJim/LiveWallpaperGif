@@ -10,20 +10,24 @@ import kotlin.random.Random
 
 class CloudsAnimation(
     private val context: Context,
-    private val bitmaps: List<Bitmap>,
+    private val bitmaps: List<Bitmap>
 ) {
-    private lateinit var sharedPreferences: SharedPreferences
-    private data class Cloud(val bitmap: Bitmap, var x: Int, var y: Int, var dx: Int)
-    private val clouds = mutableListOf<Cloud>()
+    private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val utilities = Utilities()
     private val maxy = utilities.getScreenSize(context).y
-    var cloudsOutOfScreenCount = 0
+    private val clouds = mutableListOf<Cloud>()
+    private var cloudsOutOfScreenCount = 0
+
+    init {
+        initClouds()
+    }
+
     fun initClouds() {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        clouds.clear()
         val baseSpeed = sharedPreferences.getInt("speed", 5)
 
         for (i in 0 until MAX_CLOUDS) {
-            val bitmap = bitmaps[Random.nextInt(bitmaps.size)]
+            val bitmap = bitmaps.random()
             val x = -Random.nextInt(0, INITIAL_OFFSET)
             val y = Random.nextInt(0, maxy)
             val speedVariation = Random.nextInt(0, 4)
@@ -32,14 +36,15 @@ class CloudsAnimation(
         }
     }
 
-    fun reorderClouds() {
+    private fun reorderClouds() {
         clouds.shuffle()
-        initClouds()
         cloudsOutOfScreenCount = 0
     }
 
     fun draw(canvas: Canvas) {
-        for (cloud in clouds) {
+        val iterator = clouds.iterator()
+        while (iterator.hasNext()) {
+            val cloud = iterator.next()
             cloud.x += cloud.dx
 
             if (cloud.x > canvas.width) {
@@ -47,41 +52,39 @@ class CloudsAnimation(
                 cloud.y = Random.nextInt(0, maxy)
             }
 
-            if (isCloudVisible(cloud, canvas, clouds.size)) {
+            if (isCloudVisible(cloud, canvas)) {
                 canvas.drawBitmap(cloud.bitmap, cloud.x.toFloat(), cloud.y.toFloat(), Paint())
+            } else if (cloud.x + cloud.bitmap.width < 0) {
+                iterator.remove() // Remove clouds that have passed the screen
+                cloudsOutOfScreenCount++
             }
+        }
+
+        // Check if all clouds have passed the screen and reorder them
+        if (cloudsOutOfScreenCount == MAX_CLOUDS) {
+            reorderClouds()
+            cloudsOutOfScreenCount = 0
         }
     }
 
-
-    private fun isCloudVisible(cloud: Cloud, canvas: Canvas, clouds: Int): Boolean {
-        val isVisible = cloud.x < canvas.width && cloud.x + cloud.bitmap.width > 0 &&
+    private fun isCloudVisible(cloud: Cloud, canvas: Canvas): Boolean {
+        return cloud.x < canvas.width && cloud.x + cloud.bitmap.width > 0 &&
                 cloud.y < canvas.height && cloud.y + cloud.bitmap.height > 0
-
-        val isOnEdgeOfScreen = cloud.x + cloud.bitmap.width >= canvas.width
-        val isAlmostOutOfScreen = cloud.x + cloud.bitmap.width >= canvas.width - cloud.dx
-
-        if (!isVisible && isOnEdgeOfScreen && isAlmostOutOfScreen) {
-            cloudsOutOfScreenCount++
-            if (cloudsOutOfScreenCount == clouds) {
-                reorderClouds()
-            }
-        }
-
-
-        return isVisible
     }
-
 
     fun setSpeed(newSpeed: Int) {
-        val speedVariation = Random.nextInt(0, 4)
         for (cloud in clouds) {
-            cloud.dx =  newSpeed + speedVariation
+            val speedVariation = Random.nextInt(0, 4)
+            cloud.dx = newSpeed + speedVariation
         }
     }
+
+    data class Cloud(val bitmap: Bitmap, var x: Int, var y: Int, var dx: Int)
+
     companion object {
         const val MAX_CLOUDS = 10
         const val INITIAL_OFFSET = 100 // Offset inicial desde el borde izquierdo
     }
 }
+
 
